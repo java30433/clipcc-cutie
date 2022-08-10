@@ -88,7 +88,7 @@ class Github {
     async entry (session, type) {
         // 指令
         if (session.raw_message === '查看用法') {
-            return session.reply('(以下指令同时适用于临时会话/群聊/好友当中)\n\n功能请求 - 提出功能请求，通过投票的方式来决定是否实现与实现优先级\n漏洞汇报 - 汇报别针社区的漏洞\n\n以上内容均会同步至 https://github.com/Clipteam/clip-community 的 issue 区，直接创建的 issue 将不被受理。\n⚠️如有安全性问题请直接联系管理员，不要继续通过机器人提交');
+            return session.reply('(以下指令同时适用于临时会话/群聊/好友当中)\n\n功能请求 - 提出功能请求，通过投票的方式来决定是否实现与实现优先级(使用“投票列表”查询当前所有投票中的功能)\n漏洞汇报 - 汇报别针社区的漏洞\n\n以上内容均会同步至 https://github.com/Clipteam/clip-community 的 issue 区，直接创建的 issue 将不被受理。\n⚠️如有安全性问题请直接联系管理员，不要继续通过机器人提交');
         }
     
         if (session.raw_message === '功能请求') {
@@ -111,6 +111,16 @@ class Github {
                 from: session.user_id
             };
             return session.reply('请用一句话描述你遇到的漏洞(直接发送即可)', true);
+        }
+        
+        if (session.raw_message === '投票列表') {
+            let output = "以下为进行中的功能请求投票列表："
+            this.cache.forEach((original, index) => {
+                if (original.type !== 'feature') continue;
+                if (isPlanning(original.agree.length, original.refuse.length)) continue;
+                output += "\n" + index + "：" + original.title + " 状态" + original.agree.length + "/" + original.refuse.length;
+            });
+            session.reply(output);
         }
         
         if (session.raw_message.startsWith('投票 ')) {
